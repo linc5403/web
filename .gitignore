@@ -1,6 +1,3 @@
-# django migrations
-migrations/
-
 # static dir
 static/
 
