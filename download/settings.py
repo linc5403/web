@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'zor0j!69&!^dmxyj7e8mn*($wrj-v7hlm5g6n&5_gvv-gt30e#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['test3', 'localhost', '40.73.5.89']
 
@@ -136,6 +136,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
     'formatters': {
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s %(message)s [' + socket.gethostname() + ']'
@@ -154,14 +162,24 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.SysLogHandler',
             'address': ('172.16.11.4', 514),
+            # 'filters': ['require_debug_true', 'require_debug_false'],
+            'filters': ['require_debug_true'],
             #'socktype': socket.SOCK_STREAM,
+            'facility': SysLogHandler.LOG_USER,
+            'formatter': 'verbose',
+        },
+        'syslog_trace': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.SysLogHandler',
+            'address': ('172.16.11.4', 514),
+            'filters': ['require_debug_false'],
             'facility': SysLogHandler.LOG_USER,
             'formatter': 'verbose',
         },
     },
     'loggers': {
         '': {
-            'handlers': ['syslog'],
+            'handlers': ['syslog', 'syslog_trace'],
             'level': 'INFO',
         },
         'django': {
@@ -171,3 +189,27 @@ LOGGING = {
         },
     },
 }
+
+
+# unexcepted_logger = logging.getLogger()
+# # unexcepted_logger = logging.getLogger('track_back')
+# handler = logging.handlers.SysLogHandler(
+#     address=('172.16.11.4', 514),
+#     socktype=socket.SOCK_DGRAM,
+# )
+# formatter = logging.Formatter(LOGGING['formatters']['verbose']['format'])
+# handler.setFormatter(formatter)
+# unexcepted_logger.addHandler(handler)
+# unexcepted_logger.setLevel(logging.DEBUG)
+
+
+# def log_trace_back(exctype, value, tb):
+#     log_file = StringIO()
+#     traceback.print_exception(exctype, value, tb, file=log_file)
+#     unexcepted_logger.error('{}'.format(log_file.getvalue()))
+#     # unexcepted_logger.error('{} {} {}'.format(
+#     #     exctype, value, repr(tb)
+#     # ))
+
+
+# sys.excepthook = log_trace_back
