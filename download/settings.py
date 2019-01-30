@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'analysis',
 ]
 
 MIDDLEWARE = [
@@ -76,12 +78,15 @@ WSGI_APPLICATION = 'download.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'extractor',
+        'NAME': 'web',
         'USER': 'linc',
         'PASSWORD': 'asdf1234',
         'HOST': 'test2',
         'PORT': '3306',
-        'OPTIONS': {'charset': 'utf8mb4'},
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'sql_mode': 'STRICT_TRANS_TABLES'
+        },
     }
 }
 
