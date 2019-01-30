@@ -1,6 +1,9 @@
 # static dir
 static/
 
+# logs
+logs/
+
 # pyenv
 .python-version
 
