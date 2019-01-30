@@ -154,7 +154,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.SysLogHandler',
             'address': ('172.16.11.4', 514),
-            'socktype': socket.SOCK_STREAM,
+            #'socktype': socket.SOCK_STREAM,
             'facility': SysLogHandler.LOG_USER,
             'formatter': 'verbose',
         },

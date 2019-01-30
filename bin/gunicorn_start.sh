@@ -29,7 +29,8 @@ exec /home/hunch/.pyenv/versions/3.7.1/envs/web/bin/python3.7 /home/hunch/.pyenv
   --worker-class=gevent \
   --user=$USER --group=$GROUP \
   --bind=unix:$SOCKFILE \
-  --log-level=debug \
-  --log-file=${DJANGODIR}/logs/gunicorn.log
+  --reload
+  # --log-level=debug \
+  # --log-file=${DJANGODIR}/logs/gunicorn.log
 
 #/home/hunch/.pyenv/versions/3.7.1/envs/web/bin/python3.7 /home/hunch/.pyenv/versions/web/bin/gunicorn download.wsgi:application --name=download --worker-class=gevent --workers=5 --bind=unix:/data/code/web/gunicorn.sock --log-level=info --timeout=300 --limit-request-line=8190 --reload --daemon

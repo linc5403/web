@@ -2,7 +2,7 @@
 static/
 
 # logs
-logs/
+**/logs/
 
 # pyenv
 .python-version
