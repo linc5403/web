@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import socket
+from logging.handlers import SysLogHandler
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +27,7 @@ SECRET_KEY = 'zor0j!69&!^dmxyj7e8mn*($wrj-v7hlm5g6n&5_gvv-gt30e#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['test3', 'localhost', '40.73.5.89']
 
 
 # Application definition
@@ -115,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -128,3 +130,44 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(message)s [' + socket.gethostname() + ']'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s [' + socket.gethostname() + ']'
+        },
+    },
+    'handlers': {
+        'print': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'syslog': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.SysLogHandler',
+            'address': ('172.16.11.4', 514),
+            'socktype': socket.SOCK_STREAM,
+            'facility': SysLogHandler.LOG_USER,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['syslog'],
+            'level': 'INFO',
+        },
+        'django': {
+            'handlers': ['syslog', 'print'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}

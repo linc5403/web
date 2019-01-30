@@ -1,6 +1,9 @@
 # django migrations
 migrations/
 
+# static dir
+static/
+
 # pyenv
 .python-version
 
