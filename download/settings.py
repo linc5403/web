@@ -179,7 +179,7 @@ LOGGING = {
     },
     'loggers': {
         '': {
-            'handlers': ['syslog', 'syslog_trace'],
+            'handlers': ['print', 'syslog', 'syslog_trace'],
             'level': 'INFO',
         },
         'django': {
