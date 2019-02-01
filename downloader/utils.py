@@ -1,3 +1,4 @@
+import os
 import logging
 import time
 import threading
@@ -79,3 +80,11 @@ def safety_download(url, path):
     else:
         logger.info('youtube-dl download {} sucess.'.format(url))
     return status
+
+
+def get_path_by_key(path, key):
+    for i, j, k in os.walk(path):
+        for _ in k:
+            if key in _:
+                return os.path.join(i, _)
+    return None

@@ -84,7 +84,7 @@ def request_download(request):
         key, url = get_key_and_url(url)
         try:
             item = STORAGE.objects.get(key=key)
-        except STORAGE.objects.DoesNotExist:
+        except STORAGE.DoesNotExist:
             # start download_task
             new_item = STORAGE.objects.create(
                 key=key,
@@ -98,6 +98,7 @@ def request_download(request):
             new_item.download_task = downloader
             new_item.status = STORAGE.TASK_SEND
             new_item.save()
+            return my_response(code=0, desc='new task added')
         else:
             # already in lib
             logger.info(
@@ -110,4 +111,5 @@ def request_download(request):
                 path=item.file_path,
                 desc='request already exist'
             ))
-        # send new task
+    else:
+        return my_response(code=-1, desc='only support POST')
