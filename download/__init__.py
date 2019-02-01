@@ -5,7 +5,7 @@ import sys
 import traceback
 
 
-logger = logging.getLogger()
+logger = logging.getLogger('track_back')
 
 # from download.settings import LOGGING
 

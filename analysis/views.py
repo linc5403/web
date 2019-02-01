@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from analysis.models import STORAGE
+from analysis.utils import get_key_and_url
 
 import logging
 
@@ -51,3 +52,19 @@ def update_local_to_server(request):
                 s.host, s.file_path
             ))
         return HttpResponse(content=b'ok')
+
+
+@csrf_exempt
+def request_download(request):
+    if request.method == 'POST':
+        data = request.POST
+        logger.info('receive download task: {}'.format(data))
+        url = data['url']
+        key, url = get_key_and_url(url)
+        try:
+            a = STORAGE.objects.get(key=key)
+        except STORAGE.objects.DoesNotExist:
+            # start download_task
+            pass
+        else:
+            logger.info('duplicate download task for url {}, file_path: {}'.format(url, a.file_path))

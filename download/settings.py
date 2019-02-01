@@ -163,23 +163,23 @@ LOGGING = {
             'class': 'logging.handlers.SysLogHandler',
             'address': ('172.16.11.4', 514),
             # 'filters': ['require_debug_true', 'require_debug_false'],
-            'filters': ['require_debug_true'],
+            # 'filters': ['require_debug_true'],
             #'socktype': socket.SOCK_STREAM,
             'facility': SysLogHandler.LOG_USER,
             'formatter': 'verbose',
         },
-        'syslog_trace': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.SysLogHandler',
-            'address': ('172.16.11.4', 514),
-            'filters': ['require_debug_false'],
-            'facility': SysLogHandler.LOG_USER,
-            'formatter': 'verbose',
-        },
+        # 'syslog_trace': {
+        #     'level': 'DEBUG',
+        #     'class': 'logging.handlers.SysLogHandler',
+        #     'address': ('172.16.11.4', 514),
+        #     'filters': ['require_debug_false'],
+        #     'facility': SysLogHandler.LOG_USER,
+        #     'formatter': 'verbose',
+        # },
     },
     'loggers': {
         '': {
-            'handlers': ['print', 'syslog', 'syslog_trace'],
+            'handlers': ['print', 'syslog'],
             'level': 'INFO',
         },
         'django': {
@@ -187,6 +187,12 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+        'track_back': {
+            'handlers': ['syslog', 'print'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+
     },
 }
 

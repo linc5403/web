@@ -20,5 +20,5 @@ class Command(BaseCommand):
 
 
 def test():
-    raise(Exception('abcd'))
+    # raise(Exception('abcd'))
     return 10 / 0
