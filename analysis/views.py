@@ -1,9 +1,10 @@
 # from django.shortcuts import render
-from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from analysis.models import STORAGE
-from analysis.utils import get_key_and_url
+from analysis.models import STORAGE, DOWNLOAD_TASK
+from analysis.utils import get_key_and_url, my_response
+
+from downloader.tasks import download
 
 import logging
 
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def test(request):
     logger.info('{}'.format(request))
-    return HttpResponse(content=b'abcd')
+    return my_response(desc='this is for test')
 
 
 @csrf_exempt
@@ -24,9 +25,12 @@ def analysis(request):
         logger.info('get {}'.format(params))
         url = params.get('url')
         logger.info('url = {}'.format(url))
-        return HttpResponse(content=b'url received')
+        return my_response(
+            desc='thi is a POST test, and your post data are {}, post params are {}'.format(
+                post, params)
+        )
     elif request.method == 'GET':
-        return HttpResponse(content=b'this is a get')
+        return my_response(desc='this is a get test')
 
 
 @csrf_exempt
@@ -37,7 +41,7 @@ def update_local_to_server(request):
         key = data['key']
         host = data['host']
         file_path = data['file_path']
-        cat = data['cat']
+        cat = data.get('cat', None)
         s, created = STORAGE.objects.get_or_create(
             defaults=dict(
                 cat=cat,
@@ -51,7 +55,24 @@ def update_local_to_server(request):
             logger.error('video has in lib, {}: {}'.format(
                 s.host, s.file_path
             ))
-        return HttpResponse(content=b'ok')
+            return my_response(code=1, desc='already in lib', data_dict=dict(
+                host=s.host,
+                path=s.file_path
+            ))
+        return my_response(code=0, desc='update sucess')
+
+
+"""
+class DOWNLOAD_TASK(models.Model):
+    INIT = 0
+    DOWNLODING = 1
+    FAILED = 2
+    FINISHED = 3
+    url = models.TextField()
+    started_at = models.DateTimeField(auto_now_add=True)
+    finished_at = models.DateTimeField(null=True, default=None)
+    status = models.SmallIntegerField(default=INIT)
+"""
 
 
 @csrf_exempt
@@ -62,9 +83,31 @@ def request_download(request):
         url = data['url']
         key, url = get_key_and_url(url)
         try:
-            a = STORAGE.objects.get(key=key)
+            item = STORAGE.objects.get(key=key)
         except STORAGE.objects.DoesNotExist:
             # start download_task
-            pass
+            new_item = STORAGE.objects.create(
+                key=key,
+                status=STORAGE.INIT,
+            )
+            downloader = DOWNLOAD_TASK.objects.create(
+                url=url,
+                status=DOWNLOAD_TASK.INIT
+            )
+            download.delay(task_id=downloader.id)
+            new_item.download_task = downloader
+            new_item.status = STORAGE.TASK_SEND
+            new_item.save()
         else:
-            logger.info('duplicate download task for url {}, file_path: {}'.format(url, a.file_path))
+            # already in lib
+            logger.info(
+                'duplicated download request {}'.format(dict(
+                    url=url, host=item.host, path=item.file_path)
+                )
+            )
+            return my_response(code=1, desc='has_in', data_dict=dict(
+                host=item.host,
+                path=item.file_path,
+                desc='request already exist'
+            ))
+        # send new task
