@@ -1,4 +1,5 @@
 #!/bin/bash
+# https://rakibul.net/django-gunicorn-supervisor-nginx
 
 NAME="download"                                   # Name of the application
 DJANGODIR=/data/code/web                          # Django project directory
@@ -23,11 +24,13 @@ test -d $RUNDIR || mkdir -p $RUNDIR
 
 # Start your Django Unicorn
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
+# exec gunicorn ${DJANGO_WSGI_MODULE}:application \
 exec /home/hunch/.pyenv/versions/3.7.1/envs/web/bin/python3.7 /home/hunch/.pyenv/versions/web/bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
   --name $NAME \
   --workers $NUM_WORKERS \
   --worker-class=gevent \
-  --user=$USER --group=$GROUP \
+  --user=$USER \
+  --group=$GROUP \
   --bind=unix:$SOCKFILE \
   --reload
   # --log-level=debug \
